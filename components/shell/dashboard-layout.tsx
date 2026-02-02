@@ -34,7 +34,7 @@ export function DashboardLayout({
         <AppSidebar userRole={selectedRole} onRoleChange={setSelectedRole} />
         
         {/* Main Content */}
-        <SidebarInset className="flex flex-col flex-1">
+        <SidebarInset className="flex flex-col flex-1 min-w-0">
           {/* Header */}
           <MainHeader
             userEmail={userEmail}
@@ -53,8 +53,10 @@ export function DashboardLayout({
           />
           
           {/* Page Content */}
-          <main className="flex-1 p-6">
-            {children}
+          <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">
+            <div className="w-full max-w-full">
+              {children}
+            </div>
           </main>
         </SidebarInset>
       </div>

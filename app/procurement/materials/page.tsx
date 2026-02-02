@@ -234,7 +234,7 @@ export default function MaterialsPage() {
               Browse and manage construction materials with brand-wise pricing
             </p>
           </div>
-          <Button>
+          <Button onClick={() => router.push("/procurement/materials/add")}>
             <Plus className="size-4 mr-2" />
             Add Material
           </Button>

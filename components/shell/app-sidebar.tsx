@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { ChevronRight, X } from "lucide-react"
+import { ChevronRight, X, PanelLeft } from "lucide-react"
 
 import {
   type NavElement,
@@ -110,9 +110,7 @@ export function AppSidebar({
             className="flex-1 cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center"
             title="Expand sidebar"
           >
-            <div className="relative w-5 h-5 border border-foreground/60 rounded-sm flex items-center justify-start overflow-hidden bg-transparent">
-              <div className="w-[33%] h-full bg-foreground/70 rounded-sm"></div>
-            </div>
+            <PanelLeft className="size-5 text-foreground" />
           </button>
         ) : (
           // When expanded, logo links to dashboard
@@ -131,9 +129,7 @@ export function AppSidebar({
             className="cursor-pointer hover:opacity-80 transition-opacity flex items-center justify-center shrink-0"
             title="Collapse sidebar"
           >
-            <div className="relative w-4 h-4 border border-foreground/60 rounded-sm flex items-center justify-start overflow-hidden bg-transparent">
-              <div className="w-[33%] h-full bg-foreground/70 rounded-sm"></div>
-            </div>
+            <PanelLeft className="size-4 text-foreground" />
           </button>
         )}
       </SidebarHeader>

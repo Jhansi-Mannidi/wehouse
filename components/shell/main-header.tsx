@@ -31,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 import { HeaderFilters, type ProjectCategory, type Location, type Branch } from "@/components/shell/header-filters"
 
 interface Notification {
@@ -145,39 +146,43 @@ export function MainHeader({
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-header-border bg-header px-6">
-      {/* Left Section - Empty for alignment */}
-      <div className="flex items-center gap-4" />
+    <header className="sticky top-0 z-30 flex h-14 sm:h-16 w-full items-center justify-between border-b border-header-border bg-header px-3 sm:px-6">
+      {/* Left Section - Sidebar Toggle for Mobile */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        <SidebarTrigger className="md:hidden" />
+      </div>
 
       {/* Right Section - Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-end">
         {/* Filters - Role based visibility */}
         {(userRole === "super_admin" || userRole === "city_admin") && (
-          <HeaderFilters
-            selectedCategory={selectedCategory}
-            selectedLocation={selectedLocation}
-            selectedBranch={selectedBranch}
-            onCategoryChange={onCategoryChange}
-            onLocationChange={onLocationChange}
-            onBranchChange={onBranchChange}
-            showCategoryFilter={true}
-            showLocationFilter={userRole === "super_admin"}
-          />
+          <div className="hidden sm:block">
+            <HeaderFilters
+              selectedCategory={selectedCategory}
+              selectedLocation={selectedLocation}
+              selectedBranch={selectedBranch}
+              onCategoryChange={onCategoryChange}
+              onLocationChange={onLocationChange}
+              onBranchChange={onBranchChange}
+              showCategoryFilter={true}
+              showLocationFilter={userRole === "super_admin"}
+            />
+          </div>
         )}
 
         {/* AI Toggle - Premium Gold accent */}
         <div className={cn(
-          "flex h-10 items-center gap-2 rounded-xl px-4 transition-all duration-200",
+          "flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl px-2 sm:px-4 transition-all duration-200",
           aiMode 
             ? "bg-primary/10 border border-primary/30" 
             : "bg-muted/50 border border-transparent"
         )}>
           <Sparkles className={cn(
-            "size-4 transition-colors",
+            "size-3.5 sm:size-4 transition-colors",
             aiMode ? "text-primary" : "text-muted-foreground"
           )} />
           <span className={cn(
-            "text-sm font-medium transition-colors hidden sm:inline",
+            "text-xs sm:text-sm font-medium transition-colors hidden md:inline",
             aiMode ? "text-primary" : "text-muted-foreground"
           )}>
             AI
@@ -185,7 +190,7 @@ export function MainHeader({
           <Switch 
             checked={aiMode}
             onCheckedChange={handleAIToggle}
-            className="data-[state=checked]:bg-primary"
+            className="data-[state=checked]:bg-primary scale-90 sm:scale-100"
           />
         </div>
 
@@ -193,13 +198,13 @@ export function MainHeader({
         <Button
           variant="ghost"
           size="icon"
-          className="size-10 rounded-xl hover:bg-muted"
+          className="size-9 sm:size-10 rounded-xl hover:bg-[hsl(var(--hover-bg))]"
           onClick={toggleTheme}
         >
           {isDark ? (
-            <Sun className="size-5 text-muted-foreground" />
+            <Sun className="size-4 sm:size-5 text-muted-foreground" />
           ) : (
-            <Moon className="size-5 text-muted-foreground" />
+            <Moon className="size-4 sm:size-5 text-muted-foreground" />
           )}
           <span className="sr-only">Toggle theme</span>
         </Button>
@@ -210,11 +215,11 @@ export function MainHeader({
             <Button 
               variant="ghost" 
               size="icon" 
-              className="relative size-10 rounded-xl hover:bg-muted"
+              className="relative size-9 sm:size-10 rounded-xl hover:bg-[hsl(var(--hover-bg))]"
             >
-              <Bell className="size-5 text-muted-foreground" />
+              <Bell className="size-4 sm:size-5 text-muted-foreground" />
               {unreadCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full bg-destructive text-[10px] font-semibold text-destructive-foreground">
+                <span className="absolute -right-0.5 -top-0.5 flex size-4 sm:size-5 items-center justify-center rounded-full bg-destructive text-[9px] sm:text-[10px] font-semibold text-destructive-foreground">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -277,11 +282,11 @@ export function MainHeader({
           <DropdownMenuTrigger asChild>
             <Button 
               variant="ghost" 
-              className="size-10 rounded-full p-0 ring-2 ring-transparent hover:ring-primary/20 transition-all"
+              className="size-9 sm:size-10 rounded-full p-0 ring-2 ring-transparent hover:ring-primary/20 transition-all"
             >
-              <Avatar className="size-10">
+              <Avatar className="size-9 sm:size-10">
                 {userAvatar && <AvatarImage src={userAvatar || "/placeholder.svg"} alt={userName} />}
-                <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                <AvatarFallback className="bg-[hsl(var(--hover-bg))] text-foreground text-xs sm:text-sm font-semibold">
                   {getInitials(userName)}
                 </AvatarFallback>
               </Avatar>
