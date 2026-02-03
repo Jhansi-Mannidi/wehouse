@@ -401,6 +401,40 @@ export const vendorPortalNavigation: NavElement[] = [
   },
 ]
 
+// Project Manager navigation (Hyderabad dashboard)
+export const projectManagerNavigation: NavElement[] = [
+  {
+    title: "Dashboard",
+    url: "/dashboard/project-manager",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Projects",
+    url: "/projects",
+    icon: FolderKanban,
+  },
+  {
+    title: "Vendors",
+    url: "/vendors",
+    icon: Hammer,
+    items: [
+      { title: "Onboarding", url: "/vendors/onboarding", icon: UserPlus },
+      { title: "Vendor List", url: "/vendors/onboarding/dashboard", icon: Building2 },
+    ],
+  },
+  {
+    title: "Procurement",
+    url: "/procurement",
+    icon: Package,
+    items: [
+      { title: "Vendor Discovery", url: "/procurement/vendor-discovery", icon: Search },
+      { title: "Scopes of Work", url: "/procurement/scopes", icon: FileStack },
+      { title: "Materials", url: "/procurement/materials", icon: Package },
+      { title: "Purchase Orders", url: "/procurement/orders", icon: ShoppingCart },
+    ],
+  },
+]
+
 // Procurement Manager navigation
 export const procurementManagerNavigation: NavElement[] = [
   {
@@ -480,6 +514,11 @@ export function getNavigationForRole(role: UserRole): NavElement[] {
     return vendorPortalNavigation
   }
   
+  // Project Manager gets dedicated dashboard (Hyderabad)
+  if (role === "project_manager") {
+    return projectManagerNavigation
+  }
+
   // Procurement Manager gets dedicated procurement navigation
   if (role === "procurement_manager") {
     return procurementManagerNavigation
@@ -512,14 +551,14 @@ export const roleLabels: Record<UserRole, string> = {
 export const roleDashboards: Record<UserRole, string> = {
   sales_executive: "/dashboard/sales",
   sales_coordinator: "/dashboard/coordinator",
-  project_manager: "/projects",
+  project_manager: "/dashboard/project-manager",
   site_engineer: "/site-engineer/dashboard",
   quality_assurance_officer: "/qa/vendor-review",
   quality_control_officer: "/projects",
   safety_management_officer: "/projects",
   finance_manager: "/dashboard/finance",
   procurement_manager: "/procurement",
-  city_admin: "/city-admin/vendor-management",
+  city_admin: "/city-admin/dashboard",
   super_admin: "/dashboard/management",
   customer: "/customer",
   vendor: "/vendor/invitations",

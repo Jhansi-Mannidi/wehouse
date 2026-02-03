@@ -482,20 +482,20 @@ export default function AppointmentsPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex h-[calc(100vh-120px)] gap-6">
+      <div className="flex flex-col md:flex-row h-auto min-h-[calc(100vh-120px)] md:h-[calc(100vh-120px)] gap-4 md:gap-6">
         {/* Left Panel - Calendar View */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 order-1">
           {/* Calendar Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-foreground">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
                 {isSuperAdmin ? "Team Meetings" : "Site Visits"}
               </h1>
               <Badge variant="secondary" className="bg-primary/10 text-primary">
                 {visits.filter((v) => v.status === "scheduled").length} Scheduled
               </Badge>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="flex items-center border rounded-lg">
                 <Button
                   variant={viewMode === "week" ? "default" : "ghost"}
@@ -514,7 +514,7 @@ export default function AppointmentsPage() {
                   Month
                 </Button>
               </div>
-              <Button onClick={() => setIsScheduleModalOpen(true)}>
+              <Button onClick={() => setIsScheduleModalOpen(true)} size="sm" className="shrink-0">
                 <Plus className="size-4 mr-2" />
                 {isSuperAdmin ? "Schedule Meeting" : "Schedule Visit"}
               </Button>
@@ -523,25 +523,102 @@ export default function AppointmentsPage() {
 
           {/* Calendar Navigation */}
           <div className="flex items-center justify-between mb-4">
-            <Button variant="outline" size="icon" onClick={() => navigate("prev")} className="bg-transparent">
+            <Button variant="outline" size="icon" onClick={() => navigate("prev")} className="bg-transparent shrink-0">
               <ChevronLeft className="size-4" />
             </Button>
-            <h2 className="text-lg font-medium">
+            <h2 className="text-base sm:text-lg font-medium text-center truncate px-2">
               {viewMode === "week" 
                 ? weekDays[0].toLocaleDateString("en-US", { month: "long", year: "numeric" })
                 : currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })
               }
             </h2>
-            <Button variant="outline" size="icon" onClick={() => navigate("next")} className="bg-transparent">
+            <Button variant="outline" size="icon" onClick={() => navigate("next")} className="bg-transparent shrink-0">
               <ChevronRight className="size-4" />
             </Button>
           </div>
 
-          {/* Week View Calendar Grid */}
+          {/* Week View - Mobile: day list; Desktop: grid */}
           {viewMode === "week" && (
-          <Card className="flex-1 overflow-hidden">
-            <CardContent className="p-0 h-full overflow-auto">
-              <div className="min-w-[800px]">
+          <Card className="flex-1 overflow-hidden min-h-0">
+            <CardContent className="p-0 h-full min-h-[280px] overflow-auto">
+              {/* Mobile: list of days with visits */}
+              <div className="block md:hidden divide-y divide-border">
+                {weekDays.map((day) => {
+                  const dayVisits = getVisitsForDate(day)
+                  const isToday = formatDateKey(day) === formatDateKey(new Date())
+                  return (
+                    <div
+                      key={formatDateKey(day)}
+                      className={cn(
+                        "p-4",
+                        isToday && "bg-primary/5"
+                      )}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-sm font-medium text-muted-foreground">
+                          {day.toLocaleDateString("en-US", { weekday: "long" })}
+                        </p>
+                        <p className={cn(
+                          "text-lg font-semibold",
+                          isToday && "text-primary"
+                        )}>
+                          {day.getDate()} {day.toLocaleDateString("en-US", { month: "short" })}
+                        </p>
+                      </div>
+                      {dayVisits.length === 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedDate(formatDateKey(day))
+                            setSelectedTime("09:00")
+                            setIsScheduleModalOpen(true)
+                          }}
+                          className="w-full py-4 rounded-lg border border-dashed border-border text-muted-foreground text-sm hover:bg-muted/50 transition-colors"
+                        >
+                          + Add {isSuperAdmin ? "meeting" : "visit"}
+                        </button>
+                      ) : (
+                        <div className="space-y-2">
+                          {dayVisits.map((visit) => {
+                            const config = visitTypeConfig[visit.type]
+                            return (
+                              <div
+                                key={visit.id}
+                                className={cn(
+                                  "p-3 rounded-lg text-sm",
+                                  config.color
+                                )}
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-medium">{visit.leadName}</span>
+                                  <span className="text-xs opacity-80">{visit.startTime}</span>
+                                </div>
+                                <p className="text-xs opacity-80 truncate">
+                                  {isSuperAdmin && visit.role ? visit.role : config.label}
+                                  {visit.plotLocation && ` · ${visit.plotLocation}`}
+                                </p>
+                              </div>
+                            )
+                          })}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedDate(formatDateKey(day))
+                              setSelectedTime("09:00")
+                              setIsScheduleModalOpen(true)
+                            }}
+                            className="w-full py-2 rounded-lg border border-dashed border-border text-muted-foreground text-xs hover:bg-muted/50"
+                          >
+                            + Add another
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+              {/* Desktop: calendar grid */}
+              <div className="hidden md:block min-w-[800px]">
                 {/* Day Headers */}
                 <div className="grid grid-cols-8 border-b sticky top-0 bg-card z-10">
                   <div className="p-3 text-center text-sm font-medium text-muted-foreground border-r">
@@ -625,19 +702,19 @@ export default function AppointmentsPage() {
 
           {/* Month View Calendar Grid */}
           {viewMode === "month" && (
-          <Card className="flex-1 overflow-hidden">
-            <CardContent className="p-4">
+          <Card className="flex-1 overflow-hidden min-h-0">
+            <CardContent className="p-2 sm:p-4 overflow-auto">
               {/* Weekday Headers */}
-              <div className="grid grid-cols-7 mb-2">
+              <div className="grid grid-cols-7 mb-1 sm:mb-2">
                 {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                  <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
+                  <div key={day} className="p-1 sm:p-2 text-center text-xs sm:text-sm font-medium text-muted-foreground">
                     {day}
                   </div>
                 ))}
               </div>
               
               {/* Month Days Grid */}
-              <div className="grid grid-cols-7 gap-1">
+              <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
                 {monthDays.map((day, i) => {
                   const isCurrentMonth = day.getMonth() === currentMonth.getMonth()
                   const isToday = formatDateKey(day) === formatDateKey(new Date())
@@ -647,7 +724,7 @@ export default function AppointmentsPage() {
                     <div
                       key={i}
                       className={cn(
-                        "min-h-[100px] p-2 rounded-lg border transition-colors cursor-pointer",
+                        "min-h-[72px] sm:min-h-[100px] p-1 sm:p-2 rounded border transition-colors cursor-pointer",
                         isCurrentMonth 
                           ? "bg-card hover:bg-muted/50" 
                           : "bg-muted/20 text-muted-foreground",
@@ -660,21 +737,21 @@ export default function AppointmentsPage() {
                       }}
                     >
                       <p className={cn(
-                        "text-sm font-medium mb-1",
+                        "text-xs sm:text-sm font-medium mb-0.5 sm:mb-1",
                         isToday && "text-primary"
                       )}>
                         {day.getDate()}
                       </p>
                       
                       {/* Show visits for this day */}
-                      <div className="space-y-1">
+                      <div className="space-y-0.5 sm:space-y-1">
                         {dayVisits.slice(0, 3).map((visit) => {
                           const config = visitTypeConfig[visit.type]
                           return (
                             <div
                               key={visit.id}
                               className={cn(
-                                "px-1.5 py-0.5 rounded text-[10px] truncate",
+                                "px-1 py-0.5 rounded text-[9px] sm:text-[10px] truncate",
                                 config.color
                               )}
                               onClick={(e) => e.stopPropagation()}
@@ -684,8 +761,8 @@ export default function AppointmentsPage() {
                           )
                         })}
                         {dayVisits.length > 3 && (
-                          <p className="text-[10px] text-muted-foreground pl-1">
-                            +{dayVisits.length - 3} more
+                          <p className="text-[9px] sm:text-[10px] text-muted-foreground pl-0.5 sm:pl-1">
+                            +{dayVisits.length - 3}
                           </p>
                         )}
                       </div>
@@ -710,15 +787,15 @@ export default function AppointmentsPage() {
           </div>
         </div>
 
-        {/* Right Panel - Upcoming Visits/Meetings */}
-        <div className="w-[350px] flex-shrink-0">
-          <Card className="h-full flex flex-col">
+        {/* Right Panel - Upcoming Visits/Meetings (full width on mobile, sidebar on desktop) */}
+        <div className="w-full md:w-[350px] flex-shrink-0 order-2 md:order-none">
+          <Card className="h-full min-h-0 flex flex-col">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">
                 {isSuperAdmin ? "Upcoming Meetings" : "Upcoming Visits"}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-auto space-y-3">
+            <CardContent className="flex-1 overflow-auto space-y-3 min-h-0">
               {visits
                 .filter((v) => v.status === "scheduled")
                 .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -775,20 +852,20 @@ export default function AppointmentsPage() {
                         </div>
                       </div>
 
-                      <div className="flex gap-2 mt-3 pt-2 border-t">
-                        <Button variant="outline" size="sm" className="flex-1 h-8 text-xs bg-transparent">
-                          <Phone className="size-3 mr-1" />
-                          Call
+                      <div className="flex flex-wrap gap-2 mt-3 pt-2 border-t">
+                        <Button variant="outline" size="sm" className="flex-1 min-w-0 h-8 text-xs bg-transparent">
+                          <Phone className="size-3 mr-1 shrink-0" />
+                          <span className="truncate">Call</span>
                         </Button>
                         {isSuperAdmin ? (
-                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs bg-transparent border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950">
-                            <Video className="size-3 mr-1" />
-                            Join Meeting
+                          <Button variant="outline" size="sm" className="flex-1 min-w-0 h-8 text-xs bg-transparent border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950">
+                            <Video className="size-3 mr-1 shrink-0" />
+                            <span className="truncate">Join Meeting</span>
                           </Button>
                         ) : (
-                          <Button variant="outline" size="sm" className="flex-1 h-8 text-xs bg-transparent border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950">
-                            <MessageCircle className="size-3 mr-1" />
-                            WhatsApp
+                          <Button variant="outline" size="sm" className="flex-1 min-w-0 h-8 text-xs bg-transparent border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950">
+                            <MessageCircle className="size-3 mr-1 shrink-0" />
+                            <span className="truncate">WhatsApp</span>
                           </Button>
                         )}
                       </div>
@@ -802,7 +879,7 @@ export default function AppointmentsPage() {
 
       {/* Schedule Visit Modal */}
       <Dialog open={isScheduleModalOpen} onOpenChange={setIsScheduleModalOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Schedule Site Visit</DialogTitle>
             <DialogDescription>
@@ -835,7 +912,7 @@ export default function AppointmentsPage() {
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0" align="start">
+                <PopoverContent className="w-[min(400px,calc(100vw-2rem))] p-0" align="start">
                   <Command>
                     <CommandInput placeholder="Search by name or phone..." />
                     <CommandList>
