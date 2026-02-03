@@ -542,7 +542,7 @@ export const roleLabels: Record<UserRole, string> = {
   finance_manager: "Finance Manager",
   procurement_manager: "Procurement Manager",
   city_admin: "City Admin",
-  super_admin: "Super Admins",
+  super_admin: "Super Admin",
   customer: "Customer",
   vendor: "Vendor",
 }
